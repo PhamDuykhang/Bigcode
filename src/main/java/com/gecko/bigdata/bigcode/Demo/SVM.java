@@ -8,6 +8,7 @@ import java.util.Scanner;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
+import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -26,7 +27,8 @@ import scala.Tuple3;
 public class SVM {
 	public static void main(String[] args) {
 
-		SparkConf conf = new SparkConf().setAppName("SVMvsNavie Bayes").setMaster("local");
+		SparkConf conf = new SparkConf().setAppName("SVMvs").setMaster("local");
+//		SparkContext Spc = new SparkContext(conf);
 		JavaSparkContext sc = new JavaSparkContext(conf);
 		String path = "D:/SVMTrain/Input/*";
 		
@@ -61,17 +63,22 @@ public class SVM {
 		});
 		test.saveAsTextFile("D:/SVMTrain/Test11");
 		System.out.println(test.count());
-		String iterations = "70";
+		
+		String iterations = "300";
 		final SVMModel svmModel = SVMWithSGD.train(training.rdd(), Integer.parseInt(iterations));
-
-		JavaRDD<Tuple3<String, Double, Double>> ResuleSVM = test.map(f -> {
+//		svmModel.save(Spc,"D:/SVMTrain/SVMModel");
+		JavaRDD<Tuple3<String, Double, Double>> ResultSVM = test.map(f -> {
 			return new Tuple3<String, Double, Double>(f._1, f._2.label(), svmModel.predict(f._2.features()));
 		});
-
-		double accuracySVM = 1.0 * ResuleSVM.filter(pl -> {
-			String lableName = "";
-			lableName = (pl._3() == 0.0) ? "Male" : "Female";
-			System.out.println(pl._1() + " -- " + pl._2() + "----" + lableName);
+		
+		ResultSVM.foreach(line->{
+			String fLable="";
+			String lLable="";
+			fLable=(line._2() == 0.0) ? "Male" : "Female";
+			lLable=(line._3() == 0.0) ? "Male" : "Female";
+			System.out.println(line._1()+"--"+fLable+"----"+lLable);
+		});
+		double accuracySVM = 1.0 * ResultSVM.filter(pl -> {
 			return pl._2().intValue() == pl._3().intValue();
 		}).count() / (double) test.count();
 

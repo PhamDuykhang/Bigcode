@@ -67,7 +67,7 @@ public class ImageParser {
 		 * Traverse All the files inside the Folder and sub folder. args[1] is the path
 		 * of the folder having the images
 		 */
-		String path="D:/SVMTrain/Test";
+		String path="D:/SVMTrain/Test/TestNew";
 		Files.walkFileTree(Paths.get(path.toString()), new SimpleFileVisitor<Path>() {
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -105,7 +105,7 @@ public class ImageParser {
 			 * args[2] is the Class of the image, Class = Male/Female. Vector will be
 			 * written into a text file
 			 */
-			String lable=""; // 0 Nam, 1 Nu
+			String lable="4"; // 0 Nam, 1 Nu
 			try (PrintWriter out = new PrintWriter(
 					new BufferedWriter(new FileWriter("D:/SVMTrain/Input/input-" + lable + ".csv", true)))) {
 
